@@ -70,7 +70,16 @@ button, input, select { font: inherit; color: inherit; }
     0 6px 18px rgba(20, 30, 60, 0.08);
 }
 .brand { display: flex; align-items: center; gap: 12px; }
-.mark { width: 40px; height: 40px; filter: drop-shadow(0 0 6px var(--gold-glow)); }
+.mark {
+  width: 42px; height: 42px;
+  flex: 0 0 auto;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: #000;
+  color: #fff;
+  box-shadow: 0 0 0 2px var(--hull-0), 0 0 0 3px var(--hull-3), 0 0 14px var(--gold-glow);
+}
+.mark svg { width: 62%; height: auto; display: block; }
 .brand h1 {
   margin: 0;
   font-size: 22px;
