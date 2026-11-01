@@ -1,5 +1,5 @@
 'use strict';
-/* Clipps demo workspace. Every number here comes from the in-browser simulation (sim.js). */
+/* Clipps demo workspace: live Hyperliquid market data (feed.js) with demo agents trading on paper (sim.js). */
 (function (C) {
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -11,8 +11,9 @@
   const sim = C.createSim();
   const params = new URLSearchParams(location.search);
   const state = {
-    sym: 'CLIP-PERP',
-    tf: 5000,
+    sym: 'BTC-PERP',
+    tf: 60000,
+    needsDefaults: true,
     agent: sim.agent(params.get('agent')) ? params.get('agent') : 'ORION-7',
     inspectT: null,
     side: 'BUY',
@@ -54,18 +55,12 @@
   const mkSelect = $('#mkSelect');
   const tfSelect = $('#tfSelect');
   const tkMarket = $('#tkMarket');
-  const marketOptions = (() => {
-    const groups = new Map();
-    for (const m of sim.markets) {
-      if (!groups.has(m.group)) groups.set(m.group, []);
-      groups.get(m.group).push(m);
-    }
-    return [...groups].map(([g, ms]) => `<optgroup label="Example ${g.toLowerCase()} · simulated">${ms.map((m) => `<option value="${m.s}">${m.s}</option>`).join('')}</optgroup>`).join('');
-  })();
+  const marketOptions = `<optgroup label="Hyperliquid perpetuals">${sim.markets.map((m) => `<option value="${m.s}">${m.s}</option>`).join('')}</optgroup>`;
   mkSelect.innerHTML = marketOptions;
   tkMarket.innerHTML = marketOptions;
 
   function defaultQty(m) {
+    if (!sim.priced(m)) return '';
     const q = 5000 / m.price;
     const mag = Math.pow(10, Math.floor(Math.log10(q)) - 1);
     return String(+(Math.round(q / mag) * mag).toPrecision(6));
@@ -81,9 +76,10 @@
     tkMarket.value = sym;
     setText($('#chartSym'), sym);
     setText($('#tkUnit'), m.unit);
-    tk.qty.value = defaultQty(m);
-    tk.px.value = m.price.toFixed(m.dp);
-    chart.setAttribute('aria-label', `Candlestick chart of simulated ${sym} prices`);
+    state.needsDefaults = true;
+    applyDefaults();
+    sim.feed.watch(m.coin, state.tf);
+    chart.setAttribute('aria-label', `Candlestick chart of live ${sym} prices`);
     renderQuote();
     drawChart();
     renderBook();
@@ -92,16 +88,42 @@
   }
   mkSelect.addEventListener('change', () => setMarket(mkSelect.value));
   tkMarket.addEventListener('change', () => setMarket(tkMarket.value));
-  tfSelect.addEventListener('change', () => { state.tf = Number(tfSelect.value); state.inspectT = null; drawChart(); });
+  tfSelect.addEventListener('change', () => {
+    state.tf = Number(tfSelect.value);
+    state.inspectT = null;
+    sim.feed.watch(market().coin, state.tf);
+    drawChart();
+  });
+
+  // Size and limit defaults need a live price, so they fill in once it arrives.
+  function applyDefaults() {
+    const m = market();
+    if (!state.needsDefaults || !sim.priced(m)) return;
+    state.needsDefaults = false;
+    if (!state.touched.qty) tk.qty.value = defaultQty(m);
+    if (!state.touched.px) tk.px.value = m.price.toFixed(m.dp);
+  }
 
   function renderQuote() {
     const m = market();
-    const ch = sim.change1h(m);
-    setText($('#mkPrice'), C.fmt(m.price, m.dp));
+    const f = sim.stats(m);
+    setText($('#mkPrice'), sim.priced(m) ? C.fmt(m.price, m.dp) : '—');
+    const ch = sim.change24h(m);
     const el = $('#mkChg');
-    setText(el, `${ch >= 0 ? '+' : '−'}${Math.abs(ch * 100).toFixed(2)}% 1h`);
-    el.className = 'mk-chg num ' + C.dirClass(ch);
+    setText(el, ch == null ? '' : `${ch >= 0 ? '+' : '−'}${Math.abs(ch * 100).toFixed(2)}% 24h`);
+    el.className = 'mk-chg num ' + (ch == null ? '' : C.dirClass(ch));
+    setText($('#mkFunding'), f.funding == null ? '—' : `${(f.funding * 100).toFixed(4)}%`);
+    setText($('#mkOi'), f.oi == null ? '—' : C.fmtCompact(f.oi));
+    setText($('#mkVol'), f.vol == null ? '—' : C.fmtCompact(f.vol));
   }
+
+  const feedPill = $('#feedStatus');
+  function renderFeedStatus() {
+    const st = sim.feed.status();
+    feedPill.dataset.state = st;
+    setText($('#feedStatusText'), { live: 'Live', connecting: 'Connecting…', reconnecting: 'Reconnecting…', offline: 'Market data unavailable' }[st]);
+  }
+  sim.feed.on('status', renderFeedStatus);
 
   /* ── Agent fleet: rows inspect; a separate labelled button pauses ── */
   const fleetList = $('#fleetList');
@@ -111,7 +133,7 @@
         <svg class="agent-icon" aria-hidden="true"><use href="#mark" /></svg>
         <span class="agent-lines">
           <span class="agent-line"><span class="agent-name">${a.id}</span><span class="status-chip"></span></span>
-          <span class="agent-line"><span class="agent-strat">${a.strat}</span><span class="agent-pnl num"><span class="visually-hidden">Simulated P&amp;L </span><span class="v"></span></span></span>
+          <span class="agent-line"><span class="agent-strat">${a.strat}</span><span class="agent-pnl num"><span class="visually-hidden">Paper P&amp;L </span><span class="v"></span></span></span>
         </span>
       </button>
       <button type="button" class="icon-btn agent-toggle"><svg aria-hidden="true"><use href="#i-pause" /></svg><span class="visually-hidden"></span></button>
@@ -232,9 +254,11 @@
     if (!isShown(chart)) return;
     const m = market();
     const cs = sim.candles(m, state.tf);
+    $('#chartEmpty').hidden = cs.length > 0;
     geom = C.drawChart(chart, { candles: cs, dp: m.dp, tfMs: state.tf, inspectT: state.inspectT });
     if (geom && state.inspectT != null && geom.inspIdx < 0) state.inspectT = null;
-    renderOhlc(cs);
+    if (cs.length) renderOhlc(cs);
+    else setText($('#ohlc'), '');
   }
 
   function renderOhlc(cs) {
@@ -306,7 +330,7 @@
     if (!list.length) {
       if (!$('.empty-row', posBody)) {
         posRows.clear();
-        posBody.innerHTML = '<tr class="empty-row"><td colspan="7">No simulated positions yet. Place a paper order, or wait for an agent to trade.</td></tr>';
+        posBody.innerHTML = '<tr class="empty-row"><td colspan="7">No paper positions yet. Place a paper order, or wait for an agent to trade.</td></tr>';
       }
       return;
     }
@@ -377,7 +401,7 @@
   function actRow(e) {
     const tr = document.createElement('tr');
     const dir = e.side === 'BUY' ? 'up' : e.side === 'SELL' ? 'down' : '';
-    const isFill = e.state === 'Simulated fill';
+    const isFill = e.state === 'Paper fill';
     const details = e.qty != null ? `${C.fmtQty(e.qty)} ${e.market} @ ${C.fmt(e.px, e.dp)}` : (e.target || '—');
     tr.innerHTML =
       `<td class="t">${C.fmtTime(e.t)}</td><td class="who">${C.esc(ownerName(e.who))}</td>` +
@@ -478,10 +502,11 @@
     setText($('#tkFillPx'), Number.isFinite(px) ? C.fmt(px, m.dp) : '—');
     setText($('#tkNotional'), Number.isFinite(px) && !errs.qty ? '$' + C.fmt(px * o.qty, 2) : '—');
     let rule;
-    if (o.type === 'MARKET') rule = `Market orders fill at the simulated mark ${o.side === 'BUY' ? 'plus' : 'minus'} 0.03% slippage.`;
-    else if (!Number.isFinite(px)) rule = 'Limit orders rest until the simulated price reaches your limit.';
+    if (!sim.priced(m)) rule = 'Waiting for the live price…';
+    else if (o.type === 'MARKET') rule = `Paper market orders fill at the live mark ${o.side === 'BUY' ? 'plus' : 'minus'} 0.03% slippage.`;
+    else if (!Number.isFinite(px)) rule = 'Limit orders rest until the live price reaches your limit.';
     else if (o.side === 'BUY' ? px >= m.price : px <= m.price) rule = `This limit is ${o.side === 'BUY' ? 'at or above' : 'at or below'} the current price, so it fills on the next tick at your limit.`;
-    else rule = 'Rests in Open orders until the simulated price reaches your limit.';
+    else rule = 'Rests in Open orders until the live price reaches your limit.';
     setText($('#tkRule'), rule);
   }
 
@@ -497,7 +522,7 @@
   $$('input[name="side"]').forEach((r) => r.addEventListener('change', () => { state.side = r.value; renderTicketMode(); }));
   $$('input[name="otype"]').forEach((r) => r.addEventListener('change', () => {
     state.type = r.value;
-    if (state.type === 'LIMIT' && !state.touched.px) tk.px.value = market().price.toFixed(market().dp);
+    if (state.type === 'LIMIT' && !state.touched.px && sim.priced(market())) tk.px.value = market().price.toFixed(market().dp);
     renderTicketMode();
   }));
   tk.qty.addEventListener('input', () => { state.touched.qty = true; validateTicket(); });
@@ -524,18 +549,18 @@
     const verb = o.side === 'BUY' ? 'buy' : 'sell';
     const forWho = o.owner === 'OPERATOR' ? '' : ` for ${o.owner}`;
     if (res.kind === 'filled') {
-      showOutcome(`Paper ${verb} filled${forWho}: ${C.fmtQty(o.qty)} ${m.s} at ${C.fmt(res.px, m.dp)}. Simulated fill, no real order was sent.`,
+      showOutcome(`Paper ${verb} filled${forWho}: ${C.fmtQty(o.qty)} ${m.s} at ${C.fmt(res.px, m.dp)}. Paper fill, no real order was sent.`,
         o.side === 'BUY' ? '' : 'is-sell', 'positions', 'View positions');
     } else {
       state.lastOrderId = res.order.id;
-      showOutcome(`Limit ${verb} resting${forWho}: ${C.fmtQty(o.qty)} ${m.s} at ${C.fmt(o.px, m.dp)}. It fills when the simulated price reaches your limit.`,
+      showOutcome(`Limit ${verb} resting${forWho}: ${C.fmtQty(o.qty)} ${m.s} at ${C.fmt(o.px, m.dp)}. It fills when the live price reaches your limit.`,
         'is-resting', 'orders', 'View open orders');
     }
   });
 
   sim.on('limitFilled', (o) => {
     if (o.id !== state.lastOrderId) return;
-    showOutcome(`Limit ${o.side === 'BUY' ? 'buy' : 'sell'} filled: ${C.fmtQty(o.qty)} ${o.sym} at ${C.fmt(o.px, o.m.dp)}. Simulated fill.`,
+    showOutcome(`Limit ${o.side === 'BUY' ? 'buy' : 'sell'} filled: ${C.fmtQty(o.qty)} ${o.sym} at ${C.fmt(o.px, o.m.dp)}. Paper fill.`,
       o.side === 'BUY' ? '' : 'is-sell', 'positions', 'View positions');
   });
 
@@ -559,9 +584,14 @@
   const bidRows = [...bidsEl.children];
 
   function renderBook() {
-    if (!isShown(asksEl)) return;
+    if (!isShown($('#pane-book'))) return;
     const m = market();
-    const { asks, bids, step } = sim.book(m, LEVELS);
+    const b = sim.book(m, LEVELS);
+    $('#bookEmpty').hidden = !!b;
+    $('#pane-book').classList.toggle('is-empty', !b);
+    if (!b || b.asks.length < LEVELS || b.bids.length < LEVELS) return;
+    const { asks, bids, step } = b;
+    const mid = (asks[0].p + bids[0].p) / 2;
     let ca = 0, cb = 0;
     const cumA = asks.map((l) => (ca += l.s));
     const cumB = bids.map((l) => (cb += l.s));
@@ -575,7 +605,7 @@
     };
     for (let i = 0; i < LEVELS; i++) paint(askRows[i], asks[LEVELS - 1 - i], cumA[LEVELS - 1 - i]);
     for (let i = 0; i < LEVELS; i++) paint(bidRows[i], bids[i], cumB[i]);
-    $('#spread').innerHTML = `<span class="mid">${C.fmt(m.price, m.dp)}</span><span class="sp">Spread ${C.fmt(step, m.dp)} · ${((step / m.price) * 1e4).toFixed(1)} bps</span>`;
+    $('#spread').innerHTML = `<span class="mid">${C.fmt(mid, m.dp)}</span><span class="sp">Spread ${C.fmt(step, m.dp)} · ${((step / mid) * 1e4).toFixed(2)} bps</span>`;
   }
 
   const tradesEl = $('#trades');
@@ -596,15 +626,15 @@
     });
   }
 
-  /* ── Simulation status & controls ── */
+  /* ── Agent controls & the paper-trading notice ── */
   const simToggle = $('#simToggle');
   const simBadge = $('#simBadge');
   const simInfo = $('#simInfo');
   function renderSimState() {
     const on = sim.isRunning();
     simBadge.classList.toggle('is-paused', !on);
-    setText($('#simState'), on ? 'running' : 'paused');
-    setText($('.sim-toggle-label', simToggle), on ? 'Pause simulation' : 'Resume simulation');
+    setText($('#simState'), on ? 'agents on' : 'agents paused');
+    setText($('.sim-toggle-label', simToggle), on ? 'Pause agents' : 'Resume agents');
     $('use', simToggle).setAttribute('href', on ? '#i-pause' : '#i-play');
   }
   simToggle.addEventListener('click', () => (sim.isRunning() ? sim.pause() : sim.start()));
@@ -688,6 +718,7 @@
   /* ── Render loop: update in place, skip while the tab is hidden ── */
   function renderAll() {
     if (document.hidden) return;
+    applyDefaults();
     renderQuote();
     renderFleet();
     renderInspector();
@@ -710,9 +741,10 @@
   setMarket(state.sym);
   renderTicketMode();
   if (sim.events.length) insertActivity(sim.events.slice(-80));
-  else actBody.innerHTML = '<tr class="empty-row"><td colspan="5">No activity yet. Agents are scanning.</td></tr>';
+  else actBody.innerHTML = '<tr class="empty-row"><td colspan="5">No activity yet. Agents are scanning live markets.</td></tr>';
   renderOrders();
   renderSimState();
+  renderFeedStatus();
   renderAll();
   bookTabs.select('tab-book');
   applyHash();

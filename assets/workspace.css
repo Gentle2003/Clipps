@@ -94,15 +94,55 @@
 .mk-quote { display: flex; align-items: baseline; gap: var(--s2); margin: 0 0 0 var(--s2); }
 .mk-price { font-size: 20px; font-weight: 600; }
 .mk-chg { font-size: 13px; }
-.mk-note {
+.mk-stats { display: flex; gap: var(--s5); margin: 0 0 0 var(--s3); }
+.mk-stats div { display: grid; gap: 1px; }
+.mk-stats dt { color: var(--text-3); font-size: 11px; }
+.mk-stats dd { margin: 0; font-size: 13px; }
+.feed-status {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin: 0 0 0 auto;
+  margin: 0;
   color: var(--text-2);
   font-size: 13px;
+  white-space: nowrap;
 }
-.mk-note svg { width: 14px; height: 14px; }
+.feed-status .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-3); }
+.feed-status[data-state="live"] .dot { background: var(--up); box-shadow: 0 0 0 3px var(--up-soft); }
+.feed-status[data-state="reconnecting"] .dot, .feed-status[data-state="connecting"] .dot { background: var(--gold); }
+.feed-status[data-state="offline"] { color: var(--down); }
+.feed-status[data-state="offline"] .dot { background: var(--down); }
+.feed-status .src { color: var(--text-3); }
+.feed-status .src::before { content: "· "; }
+
+/* Connect your own agent (coming soon) */
+.connect-agent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s3);
+  margin: 0 var(--s2) var(--s2);
+  padding: var(--s3);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--r-md);
+}
+.connect-title { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 0 0 2px; font-size: 13px; font-weight: 600; }
+.connect-agent .panel-sub a { color: var(--text); }
+.soon {
+  flex: 0 0 auto;
+  padding: 3px 8px;
+  border: 1px solid rgba(216, 178, 104, 0.55);
+  border-radius: var(--r-sm);
+  color: var(--gold);
+  font: 600 10px/1.2 var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.chart-empty, .book-empty { margin: 0; color: var(--text-2); font-size: 13px; }
+.chart-empty { position: absolute; inset: 0; display: grid; place-items: center; }
+.book-empty { padding: var(--s5) var(--s4); text-align: center; }
+#pane-book.is-empty .book-cols, #pane-book.is-empty .book-side, #pane-book.is-empty .book-spread { display: none; }
+.chart-src { margin-left: 6px; color: var(--text-2); font-size: 13px; font-weight: 500; }
 
 /* ── Fleet ── */
 .fleet-list { list-style: none; margin: 0; padding: var(--s2); display: grid; gap: 2px; }
@@ -165,7 +205,9 @@
 .insp-actions { display: grid; gap: var(--s2); }
 
 /* ── Chart ── */
-.chart-head { align-items: baseline; flex-wrap: wrap; row-gap: 4px; }
+.chart-head { align-items: center; flex-wrap: wrap; row-gap: 4px; }
+.chart-head .feed-status { margin-right: auto; }
+.chart-head .ohlc { flex: 1 0 100%; }
 .chart-sym { margin-left: 6px; color: var(--text-2); font-size: 13px; font-weight: 500; }
 .ohlc { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 0; color: var(--text-2); font-size: 12px; }
 .ohlc b { font-weight: 500; color: var(--text); }
@@ -487,7 +529,7 @@
   .mk-select { flex: 1 1 140px; width: auto; }
   .tf-select { width: 76px; }
   .mk-quote { flex: 1 0 100%; margin: 0; }
-  .mk-note { display: none; }
+  .mk-stats { flex: 1 0 100%; margin: 0; gap: var(--s4); }
 
   .chart-wrap { height: 260px; }
   .agent-select { min-height: 56px; }

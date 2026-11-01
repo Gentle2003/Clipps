@@ -4,12 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Demo workspace · Clipps Trade</title>
-  <meta name="description" content="The Clipps demo workspace: watch simulated agents, place paper orders and review every action. Simulated market data, no real orders." />
+  <meta name="description" content="The Clipps workspace: watch AI agents paper-trade live perpetual futures markets, place your own paper orders and review every action. Live market data, no real orders." />
   <meta name="theme-color" content="#07090d" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Clipps Trade" />
   <meta property="og:title" content="Clipps demo workspace" />
-  <meta property="og:description" content="Watch simulated agents, place paper orders and review every action. Simulated market data, no real orders." />
+  <meta property="og:description" content="Watch AI agents paper-trade live perpetual futures, place your own paper orders and review every action." />
   <meta property="og:url" content="https://www.clipps.si/demo/" />
   <meta property="og:image" content="https://www.clipps.si/og-image.png" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -35,15 +35,15 @@
     <div class="ws-header-actions">
       <div class="sim-status">
         <button type="button" class="sim-badge" id="simBadge" aria-expanded="false" aria-controls="simInfo">
-          <span class="dot" aria-hidden="true"></span>Simulation<span class="sim-state" id="simState">running</span>
+          <span class="dot" aria-hidden="true"></span>Paper trading<span class="sim-state" id="simState">agents on</span>
         </button>
         <div class="popover" id="simInfo" hidden>
-          <p class="popover-title">Simulation</p>
-          <p>Client-generated simulated market data and paper fills. No real orders are sent.</p>
+          <p class="popover-title">Live markets, paper trades</p>
+          <p>Prices, candles, the order book and trades stream live from Hyperliquid. The agents are demo agents, and every order, theirs and yours, is a paper trade. Nothing is sent to an exchange.</p>
         </div>
       </div>
       <button type="button" class="btn btn-secondary btn-sm sim-toggle" id="simToggle">
-        <svg aria-hidden="true"><use href="#i-pause" /></svg><span class="sim-toggle-label">Pause simulation</span>
+        <svg aria-hidden="true"><use href="#i-pause" /></svg><span class="sim-toggle-label">Pause agents</span>
       </button>
       <a class="icon-btn ws-x" href="https://x.com/clippstrade" target="_blank" rel="noopener" aria-label="Clipps on X">
         <svg aria-hidden="true"><use href="#i-x" /></svg>
@@ -69,18 +69,22 @@
       <div class="select-wrap tf-select">
         <label for="tfSelect" class="visually-hidden">Candle interval</label>
         <select id="tfSelect">
-          <option value="5000">5s</option>
-          <option value="15000">15s</option>
           <option value="60000">1m</option>
+          <option value="300000">5m</option>
+          <option value="900000">15m</option>
         </select>
         <svg class="chev" aria-hidden="true"><use href="#i-chevron-down" /></svg>
       </div>
       <p class="mk-quote">
-        <span class="visually-hidden">Last simulated price</span>
+        <span class="visually-hidden">Last price</span>
         <span class="mk-price num" id="mkPrice">—</span>
         <span class="mk-chg num" id="mkChg">—</span>
       </p>
-      <p class="mk-note"><svg aria-hidden="true"><use href="#i-info" /></svg>Example market · simulated prices</p>
+      <dl class="mk-stats">
+        <div><dt>Funding /h</dt><dd class="num" id="mkFunding">—</dd></div>
+        <div><dt>Open interest</dt><dd class="num" id="mkOi">—</dd></div>
+        <div><dt>24h volume</dt><dd class="num" id="mkVol">—</dd></div>
+      </dl>
     </div>
 
     <div class="col col-agents">
@@ -88,11 +92,17 @@
         <header class="panel-head">
           <div>
             <h2 id="fleetTitle">Agent fleet</h2>
-            <p class="panel-sub">8 simulated agents</p>
+            <p class="panel-sub">8 demo agents · paper trading</p>
           </div>
-          <p class="panel-meta"><span class="visually-hidden">Combined simulated P&amp;L: </span><span class="num" id="fleetPnl">—</span></p>
+          <p class="panel-meta"><span class="visually-hidden">Combined paper P&amp;L: </span><span class="num" id="fleetPnl">—</span></p>
         </header>
         <ul class="fleet-list" id="fleetList"></ul>
+        <div class="connect-agent">
+          <div>
+            <p class="connect-title">Connect your own agent <span class="soon">Coming soon</span></p>
+            <p class="panel-sub">Run your agent here on paper first. <a href="mailto:support@clipps.si?subject=Notify%20me%3A%20connect%20my%20agent">Get notified</a></p>
+          </div>
+        </div>
       </section>
 
       <section class="panel inspector" id="inspector" data-views="overview agents" aria-labelledby="inspName">
@@ -107,21 +117,20 @@
           <span class="status-chip" id="inspStatus"></span>
         </header>
         <div class="insp-body">
-          <p class="insp-note">Demo strategy: this agent places randomised paper trades labelled with the strategy’s rationale. It shows the workflow, not trading skill.</p>
+          <p class="insp-note">Demo agent: it reacts to live prices with randomised paper trades labelled with this strategy’s rationale. It shows the workflow, not trading skill.</p>
           <dl class="kv">
             <div><dt>Universe</dt><dd id="inspUniverse">—</dd></div>
-            <div><dt>Candle interval</dt><dd>5s</dd></div>
-            <div><dt>Allocation</dt><dd>Simulated</dd></div>
+            <div><dt>Allocation</dt><dd>Paper</dd></div>
             <div>
               <dt>Signal confidence</dt>
               <dd class="conf"><span class="num" id="inspConf">—</span><span class="meter" aria-hidden="true"><i id="inspConfBar"></i></span></dd>
             </div>
-            <div><dt>Simulated P&amp;L</dt><dd class="num" id="inspPnl">—</dd></div>
+            <div><dt>Paper P&amp;L</dt><dd class="num" id="inspPnl">—</dd></div>
             <div><dt>Paper fills</dt><dd class="num" id="inspFills">—</dd></div>
           </dl>
           <details class="help">
             <summary>What is signal confidence?</summary>
-            <p>A simulated value between 0 and 1 that nudges this demo agent toward buying (higher) or selling (lower). It is not a model score or a prediction.</p>
+            <p>A demo value between 0 and 1 that nudges this demo agent toward buying (higher) or selling (lower). It is not a model score or a prediction.</p>
           </details>
           <div class="insp-recent">
             <h3>Recent actions</h3>
@@ -140,11 +149,13 @@
     <div class="col col-main">
       <section class="panel chart-panel" data-views="overview market" aria-labelledby="chartTitle">
         <header class="panel-head chart-head">
-          <h2 id="chartTitle">Example market <span class="chart-sym num" id="chartSym">CLIP-PERP</span></h2>
+          <h2 id="chartTitle"><span class="num" id="chartSym">BTC-PERP</span></h2>
+          <p class="feed-status" id="feedStatus" data-state="connecting"><span class="dot" aria-hidden="true"></span><span id="feedStatusText">Connecting…</span><span class="src">Hyperliquid</span></p>
           <p class="ohlc num" id="ohlc"></p>
         </header>
         <div class="chart-wrap">
-          <canvas id="chart" tabindex="0" role="img" aria-label="Candlestick chart of simulated CLIP-PERP prices" aria-describedby="chartHelp"></canvas>
+          <p class="chart-empty" id="chartEmpty">Loading live candles…</p>
+          <canvas id="chart" tabindex="0" role="img" aria-label="Candlestick chart of live BTC-PERP prices" aria-describedby="chartHelp"></canvas>
         </div>
         <p class="chart-help" id="chartHelp">Hover, drag or use the arrow keys to inspect a candle. End returns to the latest.</p>
         <p class="visually-hidden" id="chartLive" aria-live="polite"></p>
@@ -158,7 +169,7 @@
         </div>
 
         <div class="tabpanel" role="tabpanel" id="pane-positions" aria-labelledby="tab-positions" hidden>
-          <p class="pane-note">Simulated positions, marked to example-market prices. P&amp;L in USD.</p>
+          <p class="pane-note">Paper positions, marked to live Hyperliquid prices. P&amp;L in USD.</p>
           <div class="table-scroll" tabindex="0" role="region" aria-label="Positions table">
             <table class="data positions">
               <thead>
@@ -170,7 +181,7 @@
         </div>
 
         <div class="tabpanel" role="tabpanel" id="pane-orders" aria-labelledby="tab-orders" hidden>
-          <p class="pane-note">Paper limit orders rest here until the simulated price reaches them.</p>
+          <p class="pane-note">Paper limit orders rest here until the live price reaches them.</p>
           <div class="table-scroll" id="ordScroll" tabindex="0" role="region" aria-label="Open orders table">
             <table class="data orders">
               <thead>
@@ -276,6 +287,7 @@
         </div>
         <div class="tabpanel" role="tabpanel" id="pane-book" aria-labelledby="tab-book">
           <div class="book-cols" aria-hidden="true"><span>Price (USD)</span><span>Size</span><span>Total</span></div>
+          <p class="book-empty" id="bookEmpty">Waiting for the live order book…</p>
           <div class="book-side asks" id="asks"></div>
           <div class="book-spread" id="spread"></div>
           <div class="book-side bids" id="bids"></div>
@@ -294,7 +306,7 @@
   <div class="sheet-backdrop" id="sheetBackdrop" hidden></div>
 
   <footer class="ws-footer" data-sheet-inert>
-    <p>Local simulation · client-generated data · no real orders are sent · not investment advice</p>
+    <p>Live market data: Hyperliquid · demo agents · paper trading only, no real orders are sent · not investment advice</p>
     <p class="ws-footer-links">
       <a href="https://x.com/clippstrade" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-x" /></svg>@clippstrade</a>
       <a href="mailto:support@clipps.si"><svg aria-hidden="true"><use href="#i-mail" /></svg>support@clipps.si</a>
@@ -313,6 +325,7 @@
   </svg>
 
   <script src="../assets/ui.js"></script>
+  <script src="../assets/feed.js"></script>
   <script src="../assets/sim.js"></script>
   <script src="../assets/workspace.js"></script>
 </body>

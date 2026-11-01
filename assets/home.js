@@ -16,13 +16,15 @@
     if (e.key === 'Escape' && !menu.hidden) { setMenu(false); menuBtn.focus(); }
   });
 
-  /* ── Live preview (its own simulation; nothing leaves the browser) ── */
+  /* ── Live preview: live Hyperliquid BTC-PERP data, demo agents trading on paper ── */
   const sim = C.createSim({ narrate: true });
   sim.setAgentPaused('VEGA-3', true);   // show an operator control in the preview
-  sim.review('LYRA-12');
   const SHOWN = ['ORION-7', 'VEGA-3', 'LYRA-12'];
-  const SYM = 'CLIP-PERP';
-  let tf = 5000;
+  const SYM = 'BTC-PERP';
+  let tf = 60000;
+  sim.feed.watch('BTC', tf);
+  let reviewed = false;
+  sim.feed.on('prices', () => { if (!reviewed && sim.priced(sim.market(SYM))) { reviewed = true; sim.review('LYRA-12'); } });
 
   const agentList = $('#pvAgents');
   agentList.innerHTML = SHOWN.map((id) => `
@@ -81,10 +83,13 @@
   function renderChart() {
     const m = sim.market(SYM);
     C.drawChart(chart, { candles: sim.candles(m, tf), dp: m.dp, tfMs: tf, axes: false, grid: true, lastLine: false, barSpace: 6 });
+    const p = $('#pvPrice');
+    if (sim.priced(m)) { const t = C.fmt(m.price, m.dp); if (p.textContent !== t) p.textContent = t; }
   }
   const tfButtons = [...document.querySelectorAll('.pv-tf button')];
   tfButtons.forEach((b) => b.addEventListener('click', () => {
     tf = Number(b.dataset.tf);
+    sim.feed.watch('BTC', tf);
     tfButtons.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
     renderChart();
   }));
@@ -110,7 +115,11 @@
   function renderFeed() {
     const evs = [];
     for (let i = sim.events.length - 1; i >= 0 && evs.length < 4; i--) if (relevant(sim.events[i])) evs.push(sim.events[i]);
-    if (!evs.length || evs[0].id === lastId) return;
+    if (!evs.length) {
+      if (!feed.firstChild) feed.innerHTML = '<li class="pv-wait"><span class="dot gold" aria-hidden="true"></span><time></time><span>Agents are scanning live markets…</span></li>';
+      return;
+    }
+    if (evs[0].id === lastId) return;
     lastId = evs[0].id;
     feed.innerHTML = evs.map((e) =>
       `<li><span class="dot ${dotClass(e)}" aria-hidden="true"></span><time>${C.fmtTime(e.t, false)}</time><span>${C.esc(sentence(e))}</span></li>`
@@ -126,6 +135,7 @@
   sim.on('tick', render);
   sim.on('agents', renderAgents);
   sim.on('state', render);
+  sim.feed.on('candles', ({ coin, tf: t }) => { if (coin === 'BTC' && t === tf && !document.hidden) renderChart(); });
   document.addEventListener('visibilitychange', render);
   window.addEventListener('resize', () => { renderChart(); drawWires(); });
   if ('ResizeObserver' in window) new ResizeObserver(drawWires).observe(agentsCard);

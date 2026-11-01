@@ -30,6 +30,13 @@ window.Clipps = window.Clipps || {};
 
   C.dirClass = (n) => (n > 0 ? 'up' : n < 0 ? 'down' : '');
 
+  // $3.16B · $598M · $12.4K
+  C.fmtCompact = (n) => {
+    const a = Math.abs(n);
+    const [d, u] = a >= 1e9 ? [1e9, 'B'] : a >= 1e6 ? [1e6, 'M'] : a >= 1e3 ? [1e3, 'K'] : [1, ''];
+    return '$' + (a / d).toFixed(a >= 1e3 ? (a / d >= 100 ? 0 : a / d >= 10 ? 1 : 2) : 0) + u;
+  };
+
   C.esc = (s) => String(s).replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
 
   C.reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
