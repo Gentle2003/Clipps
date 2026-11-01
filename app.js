@@ -530,22 +530,26 @@ function drawCore(t, dt) {
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, w, h);
 
-  // nebula + stars
-  const neb = ctx.createRadialGradient(w * 0.7, h * 0.3, 0, w * 0.7, h * 0.3, Math.max(w, h) * 0.7);
-  neb.addColorStop(0, 'rgba(40,60,150,0.25)'); neb.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.fillStyle = neb; ctx.fillRect(0, 0, w, h);
+  // pixel stars on logo black — a few brightest ones are plus-shaped, like the X banner
+  ctx.fillStyle = '#fff';
   for (const s of stars) {
     s.x -= s.sp * dt * 0.15; if (s.x < 0) s.x += 1;
-    ctx.globalAlpha = 0.45 + 0.55 * Math.abs(Math.sin(t * 0.8 + s.ph));
-    ctx.fillStyle = '#dfe6ff';
-    ctx.fillRect(s.x * w, s.y * h, s.s, s.s);
+    const tw = 0.45 + 0.55 * Math.abs(Math.sin(t * 0.8 + s.ph));
+    const px = Math.round(s.x * w), py = Math.round(s.y * h), z = s.s > 1.2 ? 3 : 2;
+    ctx.globalAlpha = tw;
+    ctx.fillRect(px, py, z, z);
+    if (s.s > 1.95) {
+      ctx.globalAlpha = tw * 0.6;
+      ctx.fillRect(px - z, py, z, z); ctx.fillRect(px + z, py, z, z);
+      ctx.fillRect(px, py - z, z, z); ctx.fillRect(px, py + z, z, z);
+    }
   }
   ctx.globalAlpha = 1;
 
   // lens flare (stage light)
   const fx = w * 0.93, fy = h * 0.2;
   const fl = ctx.createRadialGradient(fx, fy, 0, fx, fy, 70);
-  fl.addColorStop(0, 'rgba(255,255,255,0.95)'); fl.addColorStop(0.08, 'rgba(220,230,255,0.6)'); fl.addColorStop(1, 'rgba(120,150,255,0)');
+  fl.addColorStop(0, 'rgba(255,255,255,0.95)'); fl.addColorStop(0.08, 'rgba(255,255,255,0.45)'); fl.addColorStop(1, 'rgba(255,255,255,0)');
   ctx.fillStyle = fl; ctx.fillRect(fx - 70, fy - 70, 140, 140);
 
   const R = Math.min(w * 0.36, h * 0.4);

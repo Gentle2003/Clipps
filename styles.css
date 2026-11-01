@@ -11,9 +11,9 @@
   --ink-2: #4a5263;
   --ink-3: #7c8496;
 
-  --space: #03050d;
-  --space-2: #080d22;
-  --space-line: rgba(150, 170, 255, 0.12);
+  --space: #000000; /* logo black */
+  --space-2: #000000;
+  --space-line: rgba(255, 255, 255, 0.09);
   --star: #dfe6ff;
   --text: #dfe6ff;
   --text-dim: #8a94b8;
@@ -365,7 +365,7 @@ button, input, select { font: inherit; color: inherit; }
 .core-stats div {
   padding: 10px 12px;
   border-radius: 12px;
-  background: rgba(8, 12, 30, 0.55);
+  background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(6px);
   box-shadow: inset 0 0 0 1px var(--space-line);
 }
@@ -530,7 +530,7 @@ td:first-child { color: var(--ice); }
 @media (max-width: 1280px) {
   .deck {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    grid-template-rows: 460px 420px 320px 300px 300px;
+    grid-template-rows: 460px 600px 320px 300px 300px;
     grid-template-areas:
       "core   core"
       "fleet  book"
@@ -540,20 +540,31 @@ td:first-child { color: var(--ice); }
   }
   .bridge { grid-template-columns: auto minmax(0, 1fr); }
   .status { grid-column: 1 / -1; justify-content: flex-end; }
+  /* fewer depth levels so the tape below the book stays visible */
+  .book-side .book-row:nth-child(n+9) { display: none; }
 }
 @media (max-width: 760px) {
   .hull { padding: 10px 16px; }
-  .bridge { grid-template-columns: minmax(0, 1fr); }
+  .bridge { grid-template-columns: minmax(0, 1fr); position: relative; }
+  .brand { padding-right: 44px; }
+  .x-link { position: absolute; top: 14px; right: 16px; }
   .status { justify-content: flex-start; flex-wrap: wrap; }
   .deck {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: 420px 380px 420px 300px 360px auto 300px;
+    grid-template-rows: 420px auto 560px 300px 360px auto 300px;
     grid-template-areas: "core" "fleet" "book" "chart" "log" "ticket" "pos";
   }
   .core-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .book-side .book-row:nth-child(n+7) { display: none; }
+  .chart .win-head { flex-wrap: wrap; row-gap: 4px; }
+  /* positions: keep owner, market, size, uPnL */
+  .pos th:nth-child(4), .pos td:nth-child(4),
+  .pos th:nth-child(5), .pos td:nth-child(5) { display: none; }
+  .pos th, .pos td { padding-left: 10px; padding-right: 10px; }
+  .trim .vent, .keel .vent, .keel .slot { display: none; }
   .keel { flex-wrap: wrap; justify-content: center; row-gap: 8px; }
   .keel .trim-line { display: none; }
-  .trim .trim-label, .keel .trim-label { font-size: 8px; letter-spacing: 0.12em; white-space: normal; }
+  .trim .trim-label, .keel .trim-label { font-size: 8px; letter-spacing: 0.12em; }
 }
 
 .tape button > * { pointer-events: none; }
