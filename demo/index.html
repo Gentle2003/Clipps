@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Demo workspace · Clipps Trade</title>
+  <meta name="description" content="The Clipps demo workspace: watch simulated agents, place paper orders and review every action. Simulated market data, no real orders." />
+  <meta name="theme-color" content="#07090d" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Clipps Trade" />
+  <meta property="og:title" content="Clipps demo workspace" />
+  <meta property="og:description" content="Watch simulated agents, place paper orders and review every action. Simulated market data, no real orders." />
+  <meta property="og:url" content="https://www.clipps.si/demo/" />
+  <meta property="og:image" content="https://www.clipps.si/og-image.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@clippstrade" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" /></noscript>
+  <link rel="stylesheet" href="../assets/clipps.css" />
+  <link rel="stylesheet" href="../assets/workspace.css" />
+</head>
+<body class="ws">
+  <a class="skip-link" href="#workspace">Skip to workspace</a>
+
+  <header class="ws-header" data-sheet-inert>
+    <a class="brand" href="../" aria-label="Clipps home">
+      <svg class="brand-mark" aria-hidden="true"><use href="#mark" /></svg>
+      <span class="brand-word" aria-hidden="true">CLIPPS</span>
+    </a>
+    <span class="ws-title">Demo workspace</span>
+    <div class="ws-header-actions">
+      <div class="sim-status">
+        <button type="button" class="sim-badge" id="simBadge" aria-expanded="false" aria-controls="simInfo">
+          <span class="dot" aria-hidden="true"></span>Simulation<span class="sim-state" id="simState">running</span>
+        </button>
+        <div class="popover" id="simInfo" hidden>
+          <p class="popover-title">Simulation</p>
+          <p>Client-generated simulated market data and paper fills. No real orders are sent.</p>
+        </div>
+      </div>
+      <button type="button" class="btn btn-secondary btn-sm sim-toggle" id="simToggle">
+        <svg aria-hidden="true"><use href="#i-pause" /></svg><span class="sim-toggle-label">Pause simulation</span>
+      </button>
+      <a class="icon-btn ws-x" href="https://x.com/clippstrade" target="_blank" rel="noopener" aria-label="Clipps on X">
+        <svg aria-hidden="true"><use href="#i-x" /></svg>
+      </a>
+    </div>
+  </header>
+
+  <!-- Phone views (hidden on larger screens, where every panel is visible) -->
+  <nav class="ws-views" aria-label="Workspace views" data-sheet-inert>
+    <button type="button" data-view="overview" aria-pressed="true">Overview</button>
+    <button type="button" data-view="agents" aria-pressed="false">Agents</button>
+    <button type="button" data-view="market" aria-pressed="false">Market</button>
+    <button type="button" data-view="activity" aria-pressed="false">Activity</button>
+  </nav>
+
+  <main id="workspace" class="ws-grid" data-view="overview" tabindex="-1">
+    <div class="market-bar" data-sheet-inert>
+      <div class="select-wrap mk-select">
+        <label for="mkSelect" class="visually-hidden">Market</label>
+        <select id="mkSelect"></select>
+        <svg class="chev" aria-hidden="true"><use href="#i-chevron-down" /></svg>
+      </div>
+      <div class="select-wrap tf-select">
+        <label for="tfSelect" class="visually-hidden">Candle interval</label>
+        <select id="tfSelect">
+          <option value="5000">5s</option>
+          <option value="15000">15s</option>
+          <option value="60000">1m</option>
+        </select>
+        <svg class="chev" aria-hidden="true"><use href="#i-chevron-down" /></svg>
+      </div>
+      <p class="mk-quote">
+        <span class="visually-hidden">Last simulated price</span>
+        <span class="mk-price num" id="mkPrice">—</span>
+        <span class="mk-chg num" id="mkChg">—</span>
+      </p>
+      <p class="mk-note"><svg aria-hidden="true"><use href="#i-info" /></svg>Example market · simulated prices</p>
+    </div>
+
+    <div class="col col-agents">
+      <section class="panel fleet" id="agents" data-views="agents" aria-labelledby="fleetTitle">
+        <header class="panel-head">
+          <div>
+            <h2 id="fleetTitle">Agent fleet</h2>
+            <p class="panel-sub">8 simulated agents</p>
+          </div>
+          <p class="panel-meta"><span class="visually-hidden">Combined simulated P&amp;L: </span><span class="num" id="fleetPnl">—</span></p>
+        </header>
+        <ul class="fleet-list" id="fleetList"></ul>
+      </section>
+
+      <section class="panel inspector" id="inspector" data-views="overview agents" aria-labelledby="inspName">
+        <header class="panel-head insp-head">
+          <div class="insp-title">
+            <svg class="agent-icon" aria-hidden="true"><use href="#mark" /></svg>
+            <div>
+              <h2 id="inspName" tabindex="-1">—</h2>
+              <p class="panel-sub" id="inspStrat">—</p>
+            </div>
+          </div>
+          <span class="status-chip" id="inspStatus"></span>
+        </header>
+        <div class="insp-body">
+          <p class="insp-note">Demo strategy: this agent places randomised paper trades labelled with the strategy’s rationale. It shows the workflow, not trading skill.</p>
+          <dl class="kv">
+            <div><dt>Universe</dt><dd id="inspUniverse">—</dd></div>
+            <div><dt>Candle interval</dt><dd>5s</dd></div>
+            <div><dt>Allocation</dt><dd>Simulated</dd></div>
+            <div>
+              <dt>Signal confidence</dt>
+              <dd class="conf"><span class="num" id="inspConf">—</span><span class="meter" aria-hidden="true"><i id="inspConfBar"></i></span></dd>
+            </div>
+            <div><dt>Simulated P&amp;L</dt><dd class="num" id="inspPnl">—</dd></div>
+            <div><dt>Paper fills</dt><dd class="num" id="inspFills">—</dd></div>
+          </dl>
+          <details class="help">
+            <summary>What is signal confidence?</summary>
+            <p>A simulated value between 0 and 1 that nudges this demo agent toward buying (higher) or selling (lower). It is not a model score or a prediction.</p>
+          </details>
+          <div class="insp-recent">
+            <h3>Recent actions</h3>
+            <ol id="inspRecent"></ol>
+          </div>
+          <div class="insp-actions">
+            <button type="button" class="btn btn-secondary" id="inspToggle">
+              <svg aria-hidden="true"><use href="#i-pause" /></svg><span>Pause agent</span>
+            </button>
+            <button type="button" class="btn btn-secondary" id="inspDelegate">Paper order as <span id="inspDelegateId">—</span></button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="col col-main">
+      <section class="panel chart-panel" data-views="overview market" aria-labelledby="chartTitle">
+        <header class="panel-head chart-head">
+          <h2 id="chartTitle">Example market <span class="chart-sym num" id="chartSym">CLIP-PERP</span></h2>
+          <p class="ohlc num" id="ohlc"></p>
+        </header>
+        <div class="chart-wrap">
+          <canvas id="chart" tabindex="0" role="img" aria-label="Candlestick chart of simulated CLIP-PERP prices" aria-describedby="chartHelp"></canvas>
+        </div>
+        <p class="chart-help" id="chartHelp">Hover, drag or use the arrow keys to inspect a candle. End returns to the latest.</p>
+        <p class="visually-hidden" id="chartLive" aria-live="polite"></p>
+      </section>
+
+      <section class="panel outputs" id="activity" data-views="activity" aria-label="Positions, orders and activity">
+        <div class="tabs" role="tablist" aria-label="Workspace output" id="outTabs">
+          <button type="button" role="tab" id="tab-positions" aria-controls="pane-positions" aria-selected="false" tabindex="-1">Positions <span class="count num" id="posCount">0</span></button>
+          <button type="button" role="tab" id="tab-orders" aria-controls="pane-orders" aria-selected="false" tabindex="-1">Open orders <span class="count num" id="ordCount">0</span></button>
+          <button type="button" role="tab" id="tab-activity" aria-controls="pane-activity" aria-selected="true" tabindex="0">Activity</button>
+        </div>
+
+        <div class="tabpanel" role="tabpanel" id="pane-positions" aria-labelledby="tab-positions" hidden>
+          <p class="pane-note">Simulated positions, marked to example-market prices. P&amp;L in USD.</p>
+          <div class="table-scroll" tabindex="0" role="region" aria-label="Positions table">
+            <table class="data positions">
+              <thead>
+                <tr><th scope="col">Owner</th><th scope="col">Market</th><th scope="col">Side</th><th scope="col" class="num">Size</th><th scope="col" class="num">Avg price</th><th scope="col" class="num">Mark</th><th scope="col" class="num">Unrealised P&amp;L</th></tr>
+              </thead>
+              <tbody id="posBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="tabpanel" role="tabpanel" id="pane-orders" aria-labelledby="tab-orders" hidden>
+          <p class="pane-note">Paper limit orders rest here until the simulated price reaches them.</p>
+          <div class="table-scroll" id="ordScroll" tabindex="0" role="region" aria-label="Open orders table">
+            <table class="data orders">
+              <thead>
+                <tr><th scope="col">Owner</th><th scope="col">Market</th><th scope="col">Side</th><th scope="col" class="num">Size</th><th scope="col" class="num">Limit</th><th scope="col">Placed</th><th scope="col">State</th><th scope="col"><span class="visually-hidden">Action</span></th></tr>
+              </thead>
+              <tbody id="ordBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="tabpanel pane-activity" role="tabpanel" id="pane-activity" aria-labelledby="tab-activity">
+          <p class="pane-note">New rows wait while you hover, focus or scroll the list, so you can read without it moving.</p>
+          <div class="table-scroll" id="actScroll" tabindex="0" role="region" aria-label="Activity table">
+            <table class="data activity">
+              <thead>
+                <tr><th scope="col">Time</th><th scope="col">Agent</th><th scope="col">Action</th><th scope="col">Details</th><th scope="col">State</th></tr>
+              </thead>
+              <tbody id="actBody"></tbody>
+            </table>
+          </div>
+          <button type="button" class="new-events" id="newEvents" hidden></button>
+        </div>
+      </section>
+    </div>
+
+    <div class="col col-trade">
+      <div class="ticket-shell" id="ticketShell">
+        <form class="panel ticket" id="ticket" novalidate aria-labelledby="ticketTitle">
+          <header class="panel-head">
+            <div>
+              <h2 id="ticketTitle" tabindex="-1">Order ticket</h2>
+              <p class="panel-sub">Paper orders only</p>
+            </div>
+            <button type="button" class="icon-btn sheet-close" id="sheetClose">
+              <svg aria-hidden="true"><use href="#i-close" /></svg>
+              <span class="visually-hidden">Close order ticket</span>
+            </button>
+          </header>
+          <div class="ticket-body">
+            <div class="field">
+              <label for="tkMarket">Market</label>
+              <div class="select-wrap">
+                <select id="tkMarket"></select>
+                <svg class="chev" aria-hidden="true"><use href="#i-chevron-down" /></svg>
+              </div>
+            </div>
+            <fieldset class="field">
+              <legend>Side</legend>
+              <div class="segmented side">
+                <input type="radio" name="side" id="sideBuy" value="BUY" checked /><label for="sideBuy">Buy</label>
+                <input type="radio" name="side" id="sideSell" value="SELL" /><label for="sideSell">Sell</label>
+              </div>
+            </fieldset>
+            <fieldset class="field">
+              <legend>Order type</legend>
+              <div class="segmented">
+                <input type="radio" name="otype" id="typeMarket" value="MARKET" checked /><label for="typeMarket">Market</label>
+                <input type="radio" name="otype" id="typeLimit" value="LIMIT" /><label for="typeLimit">Limit</label>
+              </div>
+            </fieldset>
+            <div class="field">
+              <label for="tkQty">Size</label>
+              <div class="input-wrap">
+                <input id="tkQty" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-describedby="tkQtyErr" />
+                <span class="unit" id="tkUnit">CLIP</span>
+              </div>
+              <p class="field-error" id="tkQtyErr" hidden></p>
+            </div>
+            <div class="field" id="limitField" hidden>
+              <label for="tkPx">Limit price</label>
+              <div class="input-wrap">
+                <input id="tkPx" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-describedby="tkPxErr" />
+                <span class="unit">USD</span>
+              </div>
+              <p class="field-error" id="tkPxErr" hidden></p>
+            </div>
+            <div class="field">
+              <label for="tkOwner">Execute as</label>
+              <div class="select-wrap">
+                <select id="tkOwner" aria-describedby="tkOwnerErr"></select>
+                <svg class="chev" aria-hidden="true"><use href="#i-chevron-down" /></svg>
+              </div>
+              <p class="field-error" id="tkOwnerErr" hidden></p>
+            </div>
+            <dl class="estimate">
+              <div><dt id="tkPxLabel">Expected fill price</dt><dd class="num" id="tkFillPx">—</dd></div>
+              <div><dt>Estimated paper notional</dt><dd class="num" id="tkNotional">—</dd></div>
+            </dl>
+            <p class="field-hint" id="tkRule"></p>
+          </div>
+          <div class="ticket-foot">
+            <button type="submit" class="btn btn-buy btn-block btn-lg" id="tkSubmit" disabled>Place paper buy</button>
+            <p class="disclosure"><svg aria-hidden="true"><use href="#i-info" /></svg>No real orders are sent.</p>
+            <div class="outcome" id="tkOutcome" role="status"></div>
+          </div>
+        </form>
+      </div>
+
+      <section class="panel book-panel" data-views="market" aria-label="Order book and recent trades">
+        <div class="tabs" role="tablist" aria-label="Market depth" id="bookTabs">
+          <button type="button" role="tab" id="tab-book" aria-controls="pane-book" aria-selected="true" tabindex="0">Order book</button>
+          <button type="button" role="tab" id="tab-trades" aria-controls="pane-trades" aria-selected="false" tabindex="-1">Recent trades</button>
+        </div>
+        <div class="tabpanel" role="tabpanel" id="pane-book" aria-labelledby="tab-book">
+          <div class="book-cols" aria-hidden="true"><span>Price (USD)</span><span>Size</span><span>Total</span></div>
+          <div class="book-side asks" id="asks"></div>
+          <div class="book-spread" id="spread"></div>
+          <div class="book-side bids" id="bids"></div>
+        </div>
+        <div class="tabpanel" role="tabpanel" id="pane-trades" aria-labelledby="tab-trades" hidden>
+          <div class="book-cols" aria-hidden="true"><span>Price (USD)</span><span>Size</span><span>Time</span></div>
+          <ol class="trades" id="trades"></ol>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div class="trade-launcher" data-sheet-inert>
+    <button type="button" class="btn btn-primary btn-lg btn-block" id="openTicket" aria-controls="ticketShell" aria-expanded="false">Paper trade</button>
+  </div>
+  <div class="sheet-backdrop" id="sheetBackdrop" hidden></div>
+
+  <footer class="ws-footer" data-sheet-inert>
+    <p>Local simulation · client-generated data · no real orders are sent · not investment advice</p>
+    <p class="ws-footer-links">
+      <a href="https://x.com/clippstrade" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-x" /></svg>@clippstrade</a>
+      <a href="mailto:support@clipps.si"><svg aria-hidden="true"><use href="#i-mail" /></svg>support@clipps.si</a>
+    </p>
+  </footer>
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="mark" viewBox="0 0 125 118"><path shape-rendering="crispEdges" d="M55 0h14v3h-14zM55 3h15v1h-15zM49 4h27v4h-27zM44 8h37v2h-37zM19 10h6v2h-6zM44 10h37v2h-37zM99 10h6v2h-6zM19 12h6v4h-6zM39 12h46v4h-46zM99 12h6v4h-6zM35 16h54v1h-54zM13 17h5v2h-5zM35 17h55v2h-55zM106 17h5v2h-5zM13 19h5v2h-5zM35 19h23v2h-23zM66 19h24v2h-24zM106 19h5v2h-5zM14 21h2v1h-2zM17 21h1v1h-1zM35 21h23v1h-23zM66 21h24v1h-24zM107 21h1v1h-1zM110 21h1v1h-1zM35 22h23v1h-23zM67 22h23v1h-23zM35 23h18v3h-18zM72 23h18v3h-18zM35 26h16v1h-16zM74 26h16v1h-16zM35 27h13v3h-13zM76 27h14v3h-14zM35 30h20v1h-20zM70 30h20v1h-20zM35 31h21v1h-21zM68 31h22v1h-22zM39 32h17v1h-17zM68 32h18v1h-18zM16 33h15v4h-15zM39 33h17v4h-17zM68 33h17v4h-17zM94 33h14v4h-14zM12 37h23v2h-23zM44 37h12v2h-12zM68 37h13v2h-13zM90 37h22v2h-22zM12 39h23v1h-23zM44 39h12v1h-12zM68 39h13v1h-13zM89 39h23v1h-23zM12 40h23v1h-23zM44 40h12v1h-12zM68 40h13v1h-13zM90 40h22v1h-22zM8 41h31v4h-31zM49 41h7v4h-7zM68 41h8v4h-8zM86 41h31v4h-31zM8 45h35v1h-35zM49 45h7v1h-7zM68 45h8v1h-8zM82 45h35v1h-35zM4 46h39v1h-39zM82 46h39v1h-39zM4 47h20v2h-20zM30 47h13v2h-13zM82 47h12v2h-12zM100 47h21v2h-21zM4 49h20v2h-20zM30 49h17v2h-17zM78 49h16v2h-16zM100 49h21v2h-21zM4 51h20v1h-20zM30 51h17v1h-17zM78 51h16v1h-16zM101 51h3v1h-3zM105 51h19v1h-19zM0 52h19v2h-19zM30 52h17v2h-17zM78 52h16v2h-16zM105 52h20v2h-20zM0 54h19v9h-19zM105 54h20v9h-20zM0 63h19v2h-19zM30 63h17v2h-17zM78 63h16v2h-16zM105 63h20v2h-20zM4 65h20v1h-20zM30 65h17v1h-17zM78 65h16v1h-16zM101 65h3v1h-3zM105 65h19v1h-19zM4 66h20v2h-20zM30 66h17v2h-17zM78 66h16v2h-16zM100 66h21v2h-21zM4 68h20v2h-20zM30 68h13v2h-13zM82 68h12v2h-12zM100 68h21v2h-21zM4 70h39v1h-39zM82 70h39v1h-39zM8 71h35v1h-35zM49 71h7v1h-7zM68 71h8v1h-8zM82 71h35v1h-35zM8 72h31v4h-31zM49 72h7v4h-7zM68 72h8v4h-8zM86 72h31v4h-31zM12 76h23v1h-23zM44 76h12v1h-12zM68 76h13v1h-13zM90 76h22v1h-22zM12 77h23v1h-23zM44 77h12v1h-12zM68 77h13v1h-13zM89 77h23v1h-23zM12 78h23v2h-23zM44 78h12v2h-12zM68 78h13v2h-13zM90 78h22v2h-22zM16 80h15v4h-15zM39 80h17v4h-17zM68 80h17v4h-17zM94 80h14v4h-14zM39 84h17v1h-17zM68 84h18v1h-18zM35 85h21v1h-21zM68 85h22v1h-22zM35 86h20v1h-20zM70 86h20v1h-20zM35 87h13v3h-13zM76 87h14v3h-14zM35 90h16v1h-16zM74 90h16v1h-16zM35 91h18v3h-18zM72 91h18v3h-18zM35 94h23v1h-23zM67 94h23v1h-23zM14 95h2v1h-2zM17 95h1v1h-1zM35 95h23v1h-23zM66 95h24v1h-24zM107 95h1v1h-1zM110 95h1v1h-1zM13 96h5v2h-5zM35 96h23v2h-23zM66 96h24v2h-24zM106 96h5v2h-5zM13 98h5v2h-5zM35 98h55v2h-55zM106 98h5v2h-5zM35 100h54v1h-54zM19 101h6v4h-6zM39 101h46v4h-46zM99 101h6v4h-6zM19 105h6v2h-6zM44 105h37v2h-37zM99 105h6v2h-6zM44 107h37v2h-37zM49 109h27v4h-27zM55 113h15v1h-15zM55 114h14v3h-14z" /></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M3 5.5h18v13H3z M3.5 6l8.5 7 8.5-7" /></symbol>
+    <symbol id="i-pause" viewBox="0 0 16 16"><rect x="4" y="3" width="3" height="10" rx=".5" /><rect x="9" y="3" width="3" height="10" rx=".5" /></symbol>
+    <symbol id="i-play" viewBox="0 0 16 16"><path d="M5 3.2v9.6a.6.6 0 0 0 .9.5l7.6-4.8a.6.6 0 0 0 0-1L5.9 2.7a.6.6 0 0 0-.9.5z" /></symbol>
+    <symbol id="i-chevron-down" viewBox="0 0 16 16"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M3.5 6 8 10.5 12.5 6" /></symbol>
+    <symbol id="i-close" viewBox="0 0 16 16"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M4 4l8 8M12 4l-8 8" /></symbol>
+    <symbol id="i-info" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" stroke-width="1.4" /><rect x="7.3" y="7" width="1.4" height="4.5" rx=".5" /><circle cx="8" cy="5" r=".9" /></symbol>
+  </svg>
+
+  <script src="../assets/ui.js"></script>
+  <script src="../assets/sim.js"></script>
+  <script src="../assets/workspace.js"></script>
+</body>
+</html>

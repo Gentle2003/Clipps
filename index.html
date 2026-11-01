@@ -4,191 +4,296 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Clipps Trade</title>
-  <meta name="description" content="Clipps — the trading terminal for superintelligent agents." />
+  <meta name="description" content="The trading terminal for AI agents. Explore the Clipps simulation: observe agent activity, place paper orders and review every action. Simulated market data, no real orders." />
+  <meta name="theme-color" content="#07090d" />
   <meta name="apple-mobile-web-app-title" content="Clipps Trade" />
-  <meta property="og:title" content="Clipps Trade" />
-  <meta property="og:description" content="The trading terminal for superintelligent agents." />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Clipps Trade" />
+  <meta property="og:title" content="Clipps Trade — the trading terminal for AI agents" />
+  <meta property="og:description" content="Explore the simulation: observe agent activity, place paper orders and review every action. Simulated market data, no real orders." />
+  <meta property="og:url" content="https://www.clipps.si/" />
+  <meta property="og:image" content="https://www.clipps.si/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Clipps: the trading terminal for AI agents, with a preview of the agent workspace." />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@clippstrade" />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="apple-touch-icon" href="apple-touch-icon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" /></noscript>
+  <link rel="stylesheet" href="assets/clipps.css" />
+  <link rel="stylesheet" href="assets/home.css" />
 </head>
-<body>
-  <div class="hull">
-    <!-- ───────── Bridge (header bulkhead) ───────── -->
-    <header class="bridge">
-      <div class="brand">
-        <span class="mark" aria-hidden="true">
-          <svg viewBox="0 0 125 118" shape-rendering="crispEdges"><path fill="currentColor" d="M55 0h14v3h-14zM55 3h15v1h-15zM49 4h27v4h-27zM44 8h37v2h-37zM19 10h6v2h-6zM44 10h37v2h-37zM99 10h6v2h-6zM19 12h6v4h-6zM39 12h46v4h-46zM99 12h6v4h-6zM35 16h54v1h-54zM13 17h5v2h-5zM35 17h55v2h-55zM106 17h5v2h-5zM13 19h5v2h-5zM35 19h23v2h-23zM66 19h24v2h-24zM106 19h5v2h-5zM14 21h2v1h-2zM17 21h1v1h-1zM35 21h23v1h-23zM66 21h24v1h-24zM107 21h1v1h-1zM110 21h1v1h-1zM35 22h23v1h-23zM67 22h23v1h-23zM35 23h18v3h-18zM72 23h18v3h-18zM35 26h16v1h-16zM74 26h16v1h-16zM35 27h13v3h-13zM76 27h14v3h-14zM35 30h20v1h-20zM70 30h20v1h-20zM35 31h21v1h-21zM68 31h22v1h-22zM39 32h17v1h-17zM68 32h18v1h-18zM16 33h15v4h-15zM39 33h17v4h-17zM68 33h17v4h-17zM94 33h14v4h-14zM12 37h23v2h-23zM44 37h12v2h-12zM68 37h13v2h-13zM90 37h22v2h-22zM12 39h23v1h-23zM44 39h12v1h-12zM68 39h13v1h-13zM89 39h23v1h-23zM12 40h23v1h-23zM44 40h12v1h-12zM68 40h13v1h-13zM90 40h22v1h-22zM8 41h31v4h-31zM49 41h7v4h-7zM68 41h8v4h-8zM86 41h31v4h-31zM8 45h35v1h-35zM49 45h7v1h-7zM68 45h8v1h-8zM82 45h35v1h-35zM4 46h39v1h-39zM82 46h39v1h-39zM4 47h20v2h-20zM30 47h13v2h-13zM82 47h12v2h-12zM100 47h21v2h-21zM4 49h20v2h-20zM30 49h17v2h-17zM78 49h16v2h-16zM100 49h21v2h-21zM4 51h20v1h-20zM30 51h17v1h-17zM78 51h16v1h-16zM101 51h3v1h-3zM105 51h19v1h-19zM0 52h19v2h-19zM30 52h17v2h-17zM78 52h16v2h-16zM105 52h20v2h-20zM0 54h19v9h-19zM105 54h20v9h-20zM0 63h19v2h-19zM30 63h17v2h-17zM78 63h16v2h-16zM105 63h20v2h-20zM4 65h20v1h-20zM30 65h17v1h-17zM78 65h16v1h-16zM101 65h3v1h-3zM105 65h19v1h-19zM4 66h20v2h-20zM30 66h17v2h-17zM78 66h16v2h-16zM100 66h21v2h-21zM4 68h20v2h-20zM30 68h13v2h-13zM82 68h12v2h-12zM100 68h21v2h-21zM4 70h39v1h-39zM82 70h39v1h-39zM8 71h35v1h-35zM49 71h7v1h-7zM68 71h8v1h-8zM82 71h35v1h-35zM8 72h31v4h-31zM49 72h7v4h-7zM68 72h8v4h-8zM86 72h31v4h-31zM12 76h23v1h-23zM44 76h12v1h-12zM68 76h13v1h-13zM90 76h22v1h-22zM12 77h23v1h-23zM44 77h12v1h-12zM68 77h13v1h-13zM89 77h23v1h-23zM12 78h23v2h-23zM44 78h12v2h-12zM68 78h13v2h-13zM90 78h22v2h-22zM16 80h15v4h-15zM39 80h17v4h-17zM68 80h17v4h-17zM94 80h14v4h-14zM39 84h17v1h-17zM68 84h18v1h-18zM35 85h21v1h-21zM68 85h22v1h-22zM35 86h20v1h-20zM70 86h20v1h-20zM35 87h13v3h-13zM76 87h14v3h-14zM35 90h16v1h-16zM74 90h16v1h-16zM35 91h18v3h-18zM72 91h18v3h-18zM35 94h23v1h-23zM67 94h23v1h-23zM14 95h2v1h-2zM17 95h1v1h-1zM35 95h23v1h-23zM66 95h24v1h-24zM107 95h1v1h-1zM110 95h1v1h-1zM13 96h5v2h-5zM35 96h23v2h-23zM66 96h24v2h-24zM106 96h5v2h-5zM13 98h5v2h-5zM35 98h55v2h-55zM106 98h5v2h-5zM35 100h54v1h-54zM19 101h6v4h-6zM39 101h46v4h-46zM99 101h6v4h-6zM19 105h6v2h-6zM44 105h37v2h-37zM99 105h6v2h-6zM44 107h37v2h-37zM49 109h27v4h-27zM55 113h15v1h-15zM55 114h14v3h-14z"/></svg>
-        </span>
-        <div>
-          <h1>CLIPPS</h1>
-          <p>Trading terminal for superintelligent agents</p>
-        </div>
-      </div>
+<body class="home">
+  <a class="skip-link" href="#main">Skip to content</a>
 
-      <nav class="tape" id="tape" aria-label="Markets"></nav>
-
-      <div class="status">
-        <span class="pill"><i class="led amber"></i>SIM FEED</span>
-        <span class="pill" id="agentsOnline"><i class="led green"></i>8/8 AGENTS</span>
-        <span class="clock" id="clock">--:--:--</span>
-        <a class="x-link" href="https://x.com/clippstrade" target="_blank" rel="noopener" aria-label="Clipps on X" title="@clippstrade on X">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-        </a>
-      </div>
-    </header>
-
-    <div class="trim">
-      <span class="vent"></span><span class="slot on"></span><span class="slot"></span><span class="slot on"></span>
-      <span class="trim-label">DECK 01 · EXECUTION</span>
-      <span class="trim-line"></span>
-      <span class="slot on"></span><span class="vent"></span>
-    </div>
-
-    <!-- ───────── Deck ───────── -->
-    <main class="deck">
-      <!-- Agent fleet -->
-      <section class="window fleet">
-        <div class="win-head">
-          <h2>Agent Fleet</h2>
-          <span class="tag" id="fleetPnl">—</span>
-        </div>
-        <ul class="fleet-list" id="fleet"></ul>
-      </section>
-
-      <!-- Core viewport -->
-      <section class="window core">
-        <canvas id="core"></canvas>
-        <div class="core-hud">
-          <div class="core-top">
-            <div>
-              <div class="eyebrow">CORE · <span id="coreSym">CLIP-PERP</span></div>
-              <div class="core-price" id="corePrice">—</div>
-              <div class="core-chg" id="coreChg">—</div>
-            </div>
-            <div class="core-glyphs">
-              <span class="glyph">⌬</span>
-              <span class="glyph">◎</span>
-            </div>
-          </div>
-          <div class="core-stats">
-            <div><span>Fleet PnL</span><b id="stPnl">—</b></div>
-            <div><span>Net exposure</span><b id="stExp">—</b></div>
-            <div><span>Fills / min</span><b id="stRate">—</b></div>
-            <div><span>Consensus σ</span><b id="stSigma">—</b></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Order book (tall side window) -->
-      <section class="window book">
-        <div class="win-head">
-          <h2>Order Book</h2>
-          <span class="tag" id="bookSym">CLIP-PERP</span>
-        </div>
-        <div class="book-cols"><span>Price</span><span>Size</span><span>Total</span></div>
-        <div class="book-side asks" id="asks"></div>
-        <div class="spread" id="spread">—</div>
-        <div class="book-side bids" id="bids"></div>
-        <div class="win-head sub"><h2>Tape</h2></div>
-        <ul class="tape-prints" id="prints"></ul>
-      </section>
-
-      <!-- Chart -->
-      <section class="window chart">
-        <div class="win-head">
-          <h2><span id="chartSym">CLIP-PERP</span> <em>· 5s candles</em></h2>
-          <span class="tag" id="ohlc">—</span>
-        </div>
-        <canvas id="chart"></canvas>
-      </section>
-
-      <!-- Positions -->
-      <section class="window pos">
-        <div class="win-head">
-          <h2>Positions</h2>
-          <span class="tag" id="posCount">0 open</span>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Owner</th><th>Market</th><th>Size</th><th>Avg</th><th>Mark</th><th>uPnL</th></tr></thead>
-            <tbody id="positions"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- Execution log -->
-      <section class="window log">
-        <div class="win-head">
-          <h2>Execution Log</h2>
-          <span class="tag live"><i class="led green"></i>LIVE</span>
-        </div>
-        <ol class="log-list" id="log"></ol>
-      </section>
-
-      <!-- Order ticket (hull console) -->
-      <aside class="module ticket">
-        <div class="mod-head">
-          <span class="vent small"></span>
-          <h2>Order Ticket</h2>
-          <span class="slot on"></span>
-        </div>
-        <form id="ticket" autocomplete="off">
-          <div class="field">
-            <label>Market</label>
-            <div class="readout" id="tkSym">CLIP-PERP</div>
-          </div>
-          <div class="seg" role="radiogroup" aria-label="Side">
-            <button type="button" class="seg-btn buy active" data-side="BUY">Buy</button>
-            <button type="button" class="seg-btn sell" data-side="SELL">Sell</button>
-          </div>
-          <div class="seg type" role="radiogroup" aria-label="Order type">
-            <button type="button" class="seg-btn active" data-type="MARKET">Market</button>
-            <button type="button" class="seg-btn" data-type="LIMIT">Limit</button>
-          </div>
-          <div class="field">
-            <label for="tkQty">Size</label>
-            <input id="tkQty" type="number" min="0" step="any" value="1000" />
-          </div>
-          <div class="field" id="limitField" hidden>
-            <label for="tkPx">Limit price</label>
-            <input id="tkPx" type="number" min="0" step="any" />
-          </div>
-          <div class="field">
-            <label for="tkOwner">Execute as</label>
-            <select id="tkOwner"></select>
-          </div>
-          <div class="est"><span>Est. notional</span><b id="tkNotional">—</b></div>
-          <button type="submit" class="engage" id="engage">Engage · Buy</button>
-          <p class="fine" id="pendingInfo">Paper trading · simulated fills</p>
-        </form>
-      </aside>
-    </main>
-
-    <footer class="keel">
-      <span class="vent"></span>
-      <span class="slot on"></span><span class="slot"></span>
-      <span class="trim-line"></span>
-      <span class="trim-label">CLIPPS · SIMULATED MARKET DATA · NOT INVESTMENT ADVICE</span>
-      <span class="trim-line"></span>
-      <nav class="keel-links" aria-label="Contact">
-        <a class="keel-link" href="https://x.com/clippstrade" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-          @clippstrade
-        </a>
-        <a class="keel-link" href="mailto:support@clipps.si">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M3 5.5h18v13H3z M3.5 6l8.5 7 8.5-7"/></svg>
-          support@clipps.si
-        </a>
+  <header class="site-header">
+    <div class="container nav">
+      <a class="brand" href="./" aria-label="Clipps home">
+        <svg class="brand-mark" aria-hidden="true"><use href="#mark" /></svg>
+        <span class="brand-word" aria-hidden="true">CLIPPS</span>
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="#product">Product</a>
+        <a href="demo/">Demo</a>
+        <a href="#how">How it works</a>
+        <a href="#faq">FAQ</a>
       </nav>
-      <span class="slot"></span><span class="slot on"></span>
-      <span class="vent"></span>
-    </footer>
-  </div>
+      <div class="nav-actions">
+        <a class="icon-btn" href="https://x.com/clippstrade" target="_blank" rel="noopener" aria-label="Clipps on X">
+          <svg aria-hidden="true"><use href="#i-x" /></svg>
+        </a>
+        <a class="btn btn-secondary btn-sm nav-contact" href="mailto:support@clipps.si">Contact Clipps</a>
+        <button type="button" class="icon-btn menu-btn" id="menuBtn" aria-expanded="false" aria-controls="mobileMenu">
+          <svg aria-hidden="true"><use href="#i-menu" /></svg>
+          <span class="visually-hidden">Menu</span>
+        </button>
+      </div>
+    </div>
+    <div class="mobile-menu" id="mobileMenu" hidden>
+      <nav class="container" aria-label="Primary">
+        <a href="#product">Product</a>
+        <a href="demo/">Demo</a>
+        <a href="#how">How it works</a>
+        <a href="#faq">FAQ</a>
+        <a href="mailto:support@clipps.si">Contact Clipps</a>
+      </nav>
+    </div>
+  </header>
 
-  <script src="app.js"></script>
+  <main id="main">
+    <!-- Hero: proposition → demo status → next step → product preview -->
+    <section class="hero" aria-labelledby="heroTitle">
+      <svg class="pixels pixels-tl" viewBox="0 0 120 120" aria-hidden="true">
+        <rect x="8" y="10" width="6" height="6" /><rect x="30" y="4" width="4" height="4" /><rect x="22" y="28" width="4" height="4" />
+        <rect x="4" y="52" width="4" height="4" /><rect x="44" y="20" width="4" height="4" opacity=".6" /><rect x="12" y="84" width="4" height="4" opacity=".5" />
+      </svg>
+      <svg class="pixels pixels-tr" viewBox="0 0 120 120" aria-hidden="true">
+        <rect x="104" y="6" width="6" height="6" /><rect x="86" y="18" width="4" height="4" /><rect x="110" y="40" width="4" height="4" />
+        <rect x="70" y="4" width="4" height="4" opacity=".6" /><rect x="96" y="70" width="6" height="6" opacity=".7" /><rect x="112" y="96" width="4" height="4" opacity=".5" />
+      </svg>
+
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Interactive simulation</p>
+          <h1 id="heroTitle">The trading terminal for AI agents.</h1>
+          <p class="lede">Explore the current simulation. Observe agent activity, place paper orders, and review every action.</p>
+          <div class="cta-row">
+            <a class="btn btn-primary btn-lg" href="demo/">Explore the demo</a>
+            <a class="btn btn-secondary btn-lg" href="#how">How it works</a>
+          </div>
+          <p class="fine">Simulated market data. No real orders.</p>
+        </div>
+
+        <figure class="preview" aria-labelledby="pvTitle">
+          <div class="preview-head">
+            <p class="preview-title" id="pvTitle">Agent workspace</p>
+            <span class="sim-badge" id="pvBadge"><span class="dot" aria-hidden="true"></span>Simulation</span>
+            <button type="button" class="icon-btn pv-pause" id="pvPause">
+              <svg aria-hidden="true"><use href="#i-pause" /></svg>
+              <span class="visually-hidden">Pause preview</span>
+            </button>
+          </div>
+          <div class="preview-grid">
+            <div class="pv-card pv-agents-card">
+              <p class="mini-label">Active agents</p>
+              <ul class="pv-agents" id="pvAgents"></ul>
+              <a class="pv-link pv-more" href="demo/#agents">5 more agents in the demo<svg aria-hidden="true"><use href="#i-chevron-right" /></svg></a>
+            </div>
+            <div class="pv-stack">
+              <div class="pv-card">
+                <div class="pv-row">
+                  <p class="pv-h">Example market</p>
+                  <p class="pv-meta num"><span id="pvSym">CLIP-PERP</span> · <span id="pvPrice">—</span></p>
+                </div>
+                <canvas class="pv-chart" id="pvChart" aria-hidden="true"></canvas>
+              </div>
+              <div class="pv-card">
+                <div class="pv-row">
+                  <p class="pv-h">Paper activity</p>
+                  <a class="pv-link" href="demo/#activity">View all<svg aria-hidden="true"><use href="#i-chevron-right" /></svg></a>
+                </div>
+                <ul class="pv-feed" id="pvFeed"></ul>
+              </div>
+            </div>
+          </div>
+          <figcaption class="visually-hidden">A live preview of the demo workspace, running on simulated data.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section" id="product" aria-labelledby="productTitle">
+      <div class="container">
+        <div class="section-head">
+          <h2 id="productTitle">One workspace. Three clear actions.</h2>
+          <p class="eyebrow">Simple to explore. Built for agents.</p>
+        </div>
+        <ul class="action-cards">
+          <li>
+            <a class="action-card" href="demo/?agent=ORION-7#agents">
+              <svg class="px-icon" aria-hidden="true"><use href="#px-inspect" /></svg>
+              <span class="action-text">
+                <span class="action-title">Inspect an agent</span>
+                <span class="action-desc">See its stated strategy, current status and recent paper trades.</span>
+              </span>
+              <svg class="action-chev" aria-hidden="true"><use href="#i-chevron-right" /></svg>
+            </a>
+          </li>
+          <li>
+            <a class="action-card" href="demo/#ticket">
+              <svg class="px-icon" aria-hidden="true"><use href="#px-orders" /></svg>
+              <span class="action-text">
+                <span class="action-title">Place paper orders</span>
+                <span class="action-desc">Buy or sell at simulated prices, yourself or on an agent’s behalf.</span>
+              </span>
+              <svg class="action-chev" aria-hidden="true"><use href="#i-chevron-right" /></svg>
+            </a>
+          </li>
+          <li>
+            <a class="action-card" href="demo/#activity">
+              <svg class="px-icon" aria-hidden="true"><use href="#px-activity" /></svg>
+              <span class="action-text">
+                <span class="action-title">Review activity</span>
+                <span class="action-desc">Follow fills, resting orders and cancellations in one timeline.</span>
+              </span>
+              <svg class="action-chev" aria-hidden="true"><use href="#i-chevron-right" /></svg>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="how" aria-labelledby="howTitle">
+      <div class="container how-grid">
+        <div class="how-copy">
+          <p class="eyebrow">How it works</p>
+          <h2 id="howTitle">From an agent’s strategy to an action you can review.</h2>
+          <ol class="steps">
+            <li>
+              <h3>Agents run demo strategies</h3>
+              <p>Eight demo agents trade six example markets. Each has a stated strategy and a visible status. Prices are generated in your browser.</p>
+            </li>
+            <li>
+              <h3>You stay in control</h3>
+              <p>Pause or resume any agent, or use the order ticket to place a paper order yourself or on an agent’s behalf.</p>
+            </li>
+            <li>
+              <h3>Every action is reviewable</h3>
+              <p>Fills, resting limit orders and cancellations land in one activity timeline, with simulated positions and P&amp;L alongside.</p>
+            </li>
+          </ol>
+          <a class="btn btn-primary btn-lg" href="demo/">Explore the demo</a>
+        </div>
+        <figure class="core-figure">
+          <div class="core-stage">
+            <canvas id="core" aria-hidden="true"></canvas>
+            <button type="button" class="icon-btn core-pause" id="corePause">
+              <svg aria-hidden="true"><use href="#i-pause" /></svg>
+              <span class="visually-hidden">Pause animation</span>
+            </button>
+          </div>
+          <figcaption>The Clipps core. Its circuitry lights up as the preview’s agents trade.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section" id="faq" aria-labelledby="faqTitle">
+      <div class="container faq-grid">
+        <div>
+          <p class="eyebrow">FAQ</p>
+          <h2 id="faqTitle">Questions, answered plainly.</h2>
+        </div>
+        <div class="faq-list">
+          <details>
+            <summary>Is Clipps trading real money?</summary>
+            <p>No. The current Clipps demo is a simulation that runs in your browser. Market prices, agent decisions and fills are generated locally, and no orders are sent anywhere.</p>
+          </details>
+          <details>
+            <summary>Are BTC, ETH, NVDA and the other markets live?</summary>
+            <p>No. They are example markets with familiar names so the workspace is easy to read. Their prices are simulated and do not track the real instruments.</p>
+          </details>
+          <details>
+            <summary>What do the agents actually do?</summary>
+            <p>Each demo agent has a stated strategy, a status and a simulated signal-confidence value. In this simulation they place randomised paper trades labelled with their strategy’s rationale. It shows the workflow, not trading skill or performance.</p>
+          </details>
+          <details>
+            <summary>Can I connect my own agent?</summary>
+            <p>Not yet. If you are building agents and want to talk about what Clipps should support, email <a href="mailto:support@clipps.si">support@clipps.si</a>.</p>
+          </details>
+          <details>
+            <summary>Why “superintelligent agents”?</summary>
+            <p>It is our long-term vision: a terminal built for very capable autonomous agents, where people can still see and steer what those agents do. Today’s demo shows the interface ideas, not those agents.</p>
+          </details>
+          <details>
+            <summary>Is any of this investment advice?</summary>
+            <p>No. Nothing on this site is investment advice.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-band" aria-labelledby="ctaTitle">
+      <div class="container cta-inner">
+        <div>
+          <p class="eyebrow">Our vision</p>
+          <h2 id="ctaTitle">A terminal for superintelligent agents, that people can still read and steer.</h2>
+          <p class="cta-sub">Today, Clipps is an open simulation you can explore. Tell us what you would want it to do for your agents.</p>
+        </div>
+        <div class="cta-actions">
+          <a class="btn btn-primary btn-lg" href="demo/">Explore the demo</a>
+          <a class="btn btn-secondary btn-lg" href="mailto:support@clipps.si">Contact Clipps</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="./" aria-label="Clipps home">
+          <svg class="brand-mark" aria-hidden="true"><use href="#mark" /></svg>
+          <span class="brand-word" aria-hidden="true">CLIPPS</span>
+        </a>
+        <p>The trading terminal for AI agents.</p>
+      </div>
+      <nav class="footer-nav" aria-label="Footer">
+        <a href="demo/">Demo</a>
+        <a href="#how">How it works</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <div class="footer-contact">
+        <a href="https://x.com/clippstrade" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-x" /></svg>@clippstrade</a>
+        <a href="mailto:support@clipps.si"><svg aria-hidden="true"><use href="#i-mail" /></svg>support@clipps.si</a>
+      </div>
+    </div>
+    <div class="container footer-legal">
+      <p>Simulation only: client-generated market data and paper fills. No real orders are sent. Not investment advice.</p>
+      <p>© 2026 Clipps</p>
+    </div>
+    <svg class="pixels pixels-bl" viewBox="0 0 120 60" aria-hidden="true">
+      <rect x="6" y="40" width="6" height="6" /><rect x="28" y="50" width="4" height="4" /><rect x="50" y="34" width="4" height="4" opacity=".6" /><rect x="74" y="48" width="4" height="4" opacity=".5" />
+    </svg>
+  </footer>
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="mark" viewBox="0 0 125 118"><path shape-rendering="crispEdges" d="M55 0h14v3h-14zM55 3h15v1h-15zM49 4h27v4h-27zM44 8h37v2h-37zM19 10h6v2h-6zM44 10h37v2h-37zM99 10h6v2h-6zM19 12h6v4h-6zM39 12h46v4h-46zM99 12h6v4h-6zM35 16h54v1h-54zM13 17h5v2h-5zM35 17h55v2h-55zM106 17h5v2h-5zM13 19h5v2h-5zM35 19h23v2h-23zM66 19h24v2h-24zM106 19h5v2h-5zM14 21h2v1h-2zM17 21h1v1h-1zM35 21h23v1h-23zM66 21h24v1h-24zM107 21h1v1h-1zM110 21h1v1h-1zM35 22h23v1h-23zM67 22h23v1h-23zM35 23h18v3h-18zM72 23h18v3h-18zM35 26h16v1h-16zM74 26h16v1h-16zM35 27h13v3h-13zM76 27h14v3h-14zM35 30h20v1h-20zM70 30h20v1h-20zM35 31h21v1h-21zM68 31h22v1h-22zM39 32h17v1h-17zM68 32h18v1h-18zM16 33h15v4h-15zM39 33h17v4h-17zM68 33h17v4h-17zM94 33h14v4h-14zM12 37h23v2h-23zM44 37h12v2h-12zM68 37h13v2h-13zM90 37h22v2h-22zM12 39h23v1h-23zM44 39h12v1h-12zM68 39h13v1h-13zM89 39h23v1h-23zM12 40h23v1h-23zM44 40h12v1h-12zM68 40h13v1h-13zM90 40h22v1h-22zM8 41h31v4h-31zM49 41h7v4h-7zM68 41h8v4h-8zM86 41h31v4h-31zM8 45h35v1h-35zM49 45h7v1h-7zM68 45h8v1h-8zM82 45h35v1h-35zM4 46h39v1h-39zM82 46h39v1h-39zM4 47h20v2h-20zM30 47h13v2h-13zM82 47h12v2h-12zM100 47h21v2h-21zM4 49h20v2h-20zM30 49h17v2h-17zM78 49h16v2h-16zM100 49h21v2h-21zM4 51h20v1h-20zM30 51h17v1h-17zM78 51h16v1h-16zM101 51h3v1h-3zM105 51h19v1h-19zM0 52h19v2h-19zM30 52h17v2h-17zM78 52h16v2h-16zM105 52h20v2h-20zM0 54h19v9h-19zM105 54h20v9h-20zM0 63h19v2h-19zM30 63h17v2h-17zM78 63h16v2h-16zM105 63h20v2h-20zM4 65h20v1h-20zM30 65h17v1h-17zM78 65h16v1h-16zM101 65h3v1h-3zM105 65h19v1h-19zM4 66h20v2h-20zM30 66h17v2h-17zM78 66h16v2h-16zM100 66h21v2h-21zM4 68h20v2h-20zM30 68h13v2h-13zM82 68h12v2h-12zM100 68h21v2h-21zM4 70h39v1h-39zM82 70h39v1h-39zM8 71h35v1h-35zM49 71h7v1h-7zM68 71h8v1h-8zM82 71h35v1h-35zM8 72h31v4h-31zM49 72h7v4h-7zM68 72h8v4h-8zM86 72h31v4h-31zM12 76h23v1h-23zM44 76h12v1h-12zM68 76h13v1h-13zM90 76h22v1h-22zM12 77h23v1h-23zM44 77h12v1h-12zM68 77h13v1h-13zM89 77h23v1h-23zM12 78h23v2h-23zM44 78h12v2h-12zM68 78h13v2h-13zM90 78h22v2h-22zM16 80h15v4h-15zM39 80h17v4h-17zM68 80h17v4h-17zM94 80h14v4h-14zM39 84h17v1h-17zM68 84h18v1h-18zM35 85h21v1h-21zM68 85h22v1h-22zM35 86h20v1h-20zM70 86h20v1h-20zM35 87h13v3h-13zM76 87h14v3h-14zM35 90h16v1h-16zM74 90h16v1h-16zM35 91h18v3h-18zM72 91h18v3h-18zM35 94h23v1h-23zM67 94h23v1h-23zM14 95h2v1h-2zM17 95h1v1h-1zM35 95h23v1h-23zM66 95h24v1h-24zM107 95h1v1h-1zM110 95h1v1h-1zM13 96h5v2h-5zM35 96h23v2h-23zM66 96h24v2h-24zM106 96h5v2h-5zM13 98h5v2h-5zM35 98h55v2h-55zM106 98h5v2h-5zM35 100h54v1h-54zM19 101h6v4h-6zM39 101h46v4h-46zM99 101h6v4h-6zM19 105h6v2h-6zM44 105h37v2h-37zM99 105h6v2h-6zM44 107h37v2h-37zM49 109h27v4h-27zM55 113h15v1h-15zM55 114h14v3h-14z" /></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M3 5.5h18v13H3z M3.5 6l8.5 7 8.5-7" /></symbol>
+    <symbol id="i-pause" viewBox="0 0 16 16"><rect x="4" y="3" width="3" height="10" rx=".5" /><rect x="9" y="3" width="3" height="10" rx=".5" /></symbol>
+    <symbol id="i-play" viewBox="0 0 16 16"><path d="M5 3.2v9.6a.6.6 0 0 0 .9.5l7.6-4.8a.6.6 0 0 0 0-1L5.9 2.7a.6.6 0 0 0-.9.5z" /></symbol>
+    <symbol id="i-chevron-right" viewBox="0 0 16 16"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M6 3.5 10.5 8 6 12.5" /></symbol>
+    <symbol id="i-menu" viewBox="0 0 16 16"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11" /></symbol>
+    <symbol id="px-inspect" viewBox="0 0 16 16"><path shape-rendering="crispEdges" d="M5 1h5v2H5zM3 3h2v2H3zM10 3h2v2h-2zM1 5h2v5H1zM12 5h2v5h-2zM3 10h2v2H3zM10 10h2v2h-2zM5 12h5v2H5zM12 12h2v2h-2zM14 14h2v2h-2z" /></symbol>
+    <symbol id="px-orders" viewBox="0 0 16 16"><path shape-rendering="crispEdges" d="M2 0h12v2H2zM2 2h2v12H2zM12 2h2v12h-2zM2 14h12v2H2zM6 4h6v2H6zM6 7h6v2H6zM6 10h4v2H6z" /></symbol>
+    <symbol id="px-activity" viewBox="0 0 16 16"><path shape-rendering="crispEdges" d="M1 11h3v4H1zM5 8h3v7H5zM9 5h3v10H9zM13 1h3v14h-3z" /></symbol>
+  </svg>
+
+  <script src="assets/ui.js"></script>
+  <script src="assets/sim.js"></script>
+  <script src="assets/core.js"></script>
+  <script src="assets/home.js"></script>
 </body>
 </html>
