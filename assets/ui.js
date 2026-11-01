@@ -43,6 +43,28 @@ window.Clipps = window.Clipps || {};
     return { w: r.width, h: r.height, dpr };
   };
 
+  /* Agent avatars: 7×7 two-tone pixel glyphs in the Clipps mark's language.
+     The shape identifies the agent; the colours come from CSS and follow its state. */
+  const GLYPHS = {
+    'ORION-7': ['..XXX..', '..XoX..', 'XXXoXXX', 'XoooooX', 'XXXoXXX', '..XoX..', '..XXX..'],
+    'VEGA-3': ['.X.X.X.', 'X.XoX.X', '.XoXoX.', 'XoX.XoX', '.XoXoX.', 'X.XoX.X', '.X.X.X.'],
+    'LYRA-12': ['.XX....', '.XoX.XX', '..XXXoX', '.XXoXX.', 'XoXXX..', 'XX.XoX.', '....XX.'],
+    'ATLAS-1': ['..XXX..', '.XoooX.', 'XoXXXoX', 'XoX.XoX', 'XoXXXoX', '.XoooX.', '..XXX..'],
+    'NOVA-9': ['...X...', '.X.X.X.', '..XoX..', 'XXoooXX', '..XoX..', '.X.X.X.', '...X...'],
+    'KEPLER-4': ['.XXXXX.', 'Xo...oX', 'X.XXX.X', 'X.XoX.X', 'X.XXX.X', 'Xo...oX', '.XXXXX.'],
+    'HELIX-2': ['XX...XX', '.Xo.oX.', '..XXX..', '..XoX..', '..XXX..', '.Xo.oX.', 'XX...XX'],
+    'RIGEL-5': ['...X...', '..XoX..', '.XoXoX.', 'XoX.XoX', '..XoX..', '..XoX..', '..XXX..'],
+  };
+  C.avatar = (id) => {
+    const g = GLYPHS[id] || GLYPHS['ORION-7'];
+    let base = '', hi = '';
+    g.forEach((row, y) => [...row].forEach((ch, x) => {
+      if (ch === 'X') base += `M${x} ${y}h1v1h-1z`;
+      else if (ch === 'o') hi += `M${x} ${y}h1v1h-1z`;
+    }));
+    return `<svg class="avatar" viewBox="0 0 7 7" shape-rendering="crispEdges" aria-hidden="true"><path class="av-base" d="${base}"/><path class="av-hi" d="${hi}"/></svg>`;
+  };
+
   const CH = {
     grid: 'rgba(245, 247, 250, 0.06)',
     label: '#8d97a8',
@@ -66,7 +88,7 @@ window.Clipps = window.Clipps || {};
   /* Draws candles (+ volume) into a canvas sized by CSS.
      With axes: price scale on the right, time scale along the bottom, last-price tag.
      Returns the geometry needed to map pointer positions back to candles. */
-  C.drawChart = function (canvas, { candles, dp, tfMs = 5000, axes = true, inspectT = null, barSpace = 8 }) {
+  C.drawChart = function (canvas, { candles, dp, tfMs = 5000, axes = true, grid = axes, lastLine = true, inspectT = null, barSpace = 8 }) {
     const { w, h, dpr } = C.fitCanvas(canvas);
     const ctx = canvas.getContext('2d');
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -93,6 +115,21 @@ window.Clipps = window.Clipps || {};
 
     ctx.font = '11px "JetBrains Mono", ui-monospace, monospace';
     ctx.lineWidth = 1;
+
+    if (!axes && grid) {
+      ctx.strokeStyle = CH.grid;
+      ctx.beginPath();
+      for (let i = 1; i < 4; i++) {
+        const yy = Math.round(padT + (innerH * i) / 4) + 0.5;
+        ctx.moveTo(padL, yy); ctx.lineTo(padL + plotW, yy);
+      }
+      const gx = Math.max(32, plotW / 6);
+      for (let x = padL + gx; x < padL + plotW - 4; x += gx) {
+        const xx = Math.round(x) + 0.5;
+        ctx.moveTo(xx, padT); ctx.lineTo(xx, h - padB);
+      }
+      ctx.stroke();
+    }
 
     if (axes) {
       ctx.textBaseline = 'middle';
@@ -147,12 +184,14 @@ window.Clipps = window.Clipps || {};
     const last = cs[n - 1];
     const col = last.c >= last.o ? CH.up : CH.down;
     const ly = Math.round(y(last.c)) + 0.5;
-    ctx.strokeStyle = col;
-    ctx.globalAlpha = 0.7;
-    ctx.setLineDash([2, 3]);
-    ctx.beginPath(); ctx.moveTo(padL, ly); ctx.lineTo(padL + plotW, ly); ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.globalAlpha = 1;
+    if (lastLine) {
+      ctx.strokeStyle = col;
+      ctx.globalAlpha = 0.7;
+      ctx.setLineDash([2, 3]);
+      ctx.beginPath(); ctx.moveTo(padL, ly); ctx.lineTo(padL + plotW, ly); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.globalAlpha = 1;
+    }
     if (axes) {
       const label = C.fmt(last.c, dp);
       ctx.textBaseline = 'middle';

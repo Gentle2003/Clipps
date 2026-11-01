@@ -55,7 +55,7 @@ window.Clipps = window.Clipps || {};
       why: () => `${rand(0.3, 1.4).toFixed(2)}% from VWAP — fading the move` },
   ];
 
-  function createSim({ warmup = 40 } = {}) {
+  function createSim({ warmup = 40, narrate = false } = {}) {
     const listeners = {};
     const emit = (type, payload) => (listeners[type] || []).forEach((fn) => fn(payload));
 
@@ -160,7 +160,8 @@ window.Clipps = window.Clipps || {};
       }
       const live = agents.filter((a) => !a.paused);
       if (live.length && Math.random() < AGENT_RATE) {
-        const a = pick(live);
+        const reviewing = live.filter((x) => x.status === 'Reviewing');
+        const a = reviewing.length && Math.random() < 0.6 ? pick(reviewing) : pick(live);
         const pool = marketsFor(a);
         const m = pool.includes(bySym.get('CLIP-PERP')) && Math.random() < 0.4 ? bySym.get('CLIP-PERP') : pick(pool);
         const pos = positions.get(`${a.id}|${m.s}`);
@@ -196,6 +197,25 @@ window.Clipps = window.Clipps || {};
       if (changed) emit('orders');
     }
 
+    // Optional narration (used by the homepage preview): agents also log scans,
+    // flagged signals and watchlist changes, and review a signal before trading on it.
+    function startReview(a) {
+      a.status = 'Reviewing';
+      a.busyUntil = simNow + rand(2500, 5000);
+      addEvent({ who: a.id, kind: 'note', note: 'review', text: `flagged a signal on ${pick(marketsFor(a)).s}`, state: '—' });
+    }
+    function narrateAct() {
+      if (Math.random() > 0.22) return;
+      const idle = agents.filter((a) => !a.paused && a.status === 'Scanning');
+      if (!idle.length) return;
+      const a = pick(idle);
+      const r = Math.random();
+      if (r < 0.4) addEvent({ who: a.id, kind: 'note', note: 'scan', text: `scanned ${2 + Math.floor(Math.random() * 5)} opportunities`, state: '—' });
+      else if (r < 0.75) startReview(a);
+      else addEvent({ who: a.id, kind: 'note', note: 'watch', text: `added ${pick(marketsFor(a)).s} to watchlist`, state: '—' });
+      emit('agents');
+    }
+
     function tick() {
       simNow += TICK_MS;
       for (const m of markets) {
@@ -218,6 +238,7 @@ window.Clipps = window.Clipps || {};
       }
       while (fillTimes.length && simNow - fillTimes[0] > 60000) fillTimes.shift();
       agentsAct();
+      if (narrate) narrateAct();
       checkResting();
       emit('tick');
     }
@@ -325,6 +346,10 @@ window.Clipps = window.Clipps || {};
       isRunning: () => timer !== null,
       now: () => simNow,
       fillsPerMinute: () => fillTimes.length,
+      review(id) {
+        const a = byId.get(id);
+        if (a && !a.paused) { startReview(a); emit('agents'); }
+      },
       validateOrder, placeOrder, cancelOrder, setAgentPaused, expectedFill,
       candles, book, change1h, ownerPnl, openPositions,
     };
